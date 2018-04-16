@@ -6,16 +6,19 @@ public class Enemy : MonoBehaviour {
     private float speed = 6f;
     private GameObject[] sites;
     public GameObject explosion;
-    private bool dead = false;
+    public bool dead = false;
     private int health = 1;
     private AudioSource source;
     public AudioClip explosionSound, deathSound;
     private bool deathClipPlayed = false;
+    public GameObject Indicator;
 
 	// Use this for initialization
 	void Awake () {
         sites = GameObject.FindGameObjectsWithTag("Sites");
         source = GetComponent<AudioSource>();
+        GameObject indicator = Instantiate(Indicator, transform.position, Quaternion.identity) as GameObject;
+        indicator.GetComponent<IndicatorManager>().enemyToTrack = gameObject; 
 	}
 	
 	// Update is called once per frame
@@ -39,7 +42,7 @@ public class Enemy : MonoBehaviour {
             Instantiate(explosion, location, Quaternion.identity);
             Death(true);
         }
-        else if (other.tag == "Player")
+        else if (other.tag == "Player" && !dead)
         {
             source.PlayOneShot(explosionSound);
             Instantiate(explosion, transform.position, Quaternion.identity);
@@ -72,6 +75,8 @@ public class Enemy : MonoBehaviour {
         Destroy(GetComponent<Rigidbody>());
         if (explosionWentOff)
         {
+            if (!PlayerMovement.gameOver)
+                AdManager.UpdateDeath();
             GameObject.FindGameObjectWithTag("GameOverController").GetComponent<GameOverScript>().GameOver();
         }
         dead = true;

@@ -1,26 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpawnerManager : MonoBehaviour {
     float enemiesPerFiveSeconds = 1;
     float whenToSpawn = 0;
-    float whenToIncreaseDifficulty;
+    float whenToIncreaseDifficulty, whenToIncreaseWaveText;
     public GameObject[] spawners;
-	// Use this for initialization
-	void Start () {
+    public Text waveText;
+    private float wave = 1;
+    // Use this for initialization
+    void Awake()
+    {
+        UpdateWaveText(0);
+    }
+
+    void Start () {
         whenToIncreaseDifficulty = Time.time + 60f;
-	}
+        whenToIncreaseWaveText = Time.time + 30f;
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		if (Time.time > whenToSpawn)
+        if (!PlayerMovement.gameOver)
         {
-            SpawnWave();
-        }
-        if (Time.time > whenToIncreaseDifficulty)
-        {
-            IncreaseDifficulty();
+            if (Time.time > whenToSpawn)
+            {
+                SpawnWave();
+            }
+            if (Time.time > whenToIncreaseDifficulty)
+            {
+                IncreaseDifficulty();
+            }
+            if (Time.time > whenToIncreaseWaveText)
+            {
+                UpdateWaveText(1);
+                whenToIncreaseWaveText = Time.time + 30f;
+            }
         }
 	}
 
@@ -37,5 +54,11 @@ public class SpawnerManager : MonoBehaviour {
     {
         enemiesPerFiveSeconds += 1;
         whenToIncreaseDifficulty = Time.time + 60f;
+    }
+
+    void UpdateWaveText (int waveIncrease)
+    {
+        wave += waveIncrease;
+        waveText.text = "Wave: " + wave;
     }
 }

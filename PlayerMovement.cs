@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour {
 
     void Start()
     {
-        whenCanShoot = Time.time + .5f;
+        whenCanShoot = Time.time;
     }
     void Update () {
         if (!dead && !gameOver)
@@ -38,8 +38,9 @@ public class PlayerMovement : MonoBehaviour {
             MoveForward();
         }
         if (gameOver && !dead)
-        {
+        { 
             anim.SetFloat("Speed_f", 0f);
+
         }
     }
 
@@ -98,22 +99,22 @@ public class PlayerMovement : MonoBehaviour {
     void MoveForward ()
     {
         anim.SetFloat("Speed_f", .3f);
-        Shoot();
+        //Shoot();
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        if ((leftButton && rightButton) || (!leftButton && !rightButton))
-        {
-            return;
-        } else if (leftButton)
-        {
-            Vector3 curRot = transform.eulerAngles;
-            curRot.y -= rotationForButtons * Time.deltaTime;
-            transform.eulerAngles = curRot;
-        } else
-        {
-            Vector3 curRot = transform.eulerAngles;
-            curRot.y += rotationForButtons * Time.deltaTime;
-            transform.eulerAngles = curRot;
-        }
+        //if ((leftButton && rightButton) || (!leftButton && !rightButton))
+        //{
+        //    return;
+        //} else if (leftButton)
+        //{
+        //    Vector3 curRot = transform.eulerAngles;
+        //    curRot.y -= rotationForButtons * Time.deltaTime;
+        //    transform.eulerAngles = curRot;
+        //} else
+        //{
+        //    Vector3 curRot = transform.eulerAngles;
+        //    curRot.y += rotationForButtons * Time.deltaTime;
+        //    transform.eulerAngles = curRot;
+        //}
     }
 
     //public void TurnLeft ()
@@ -164,8 +165,26 @@ public class PlayerMovement : MonoBehaviour {
 
     public void Death ()
     {
+        //AdManager.UpdateDeath();
         source.PlayOneShot(deathSound);
         anim.SetBool("Death_b", true);
         dead = true;
     }
+
+    public void SwipeMovement (Vector2 swipe)
+    {
+        Vector3 curRot = transform.eulerAngles;
+        curRot.y += swipe.x  * Time.deltaTime * 10f;
+        transform.eulerAngles = curRot; 
+    }
+
+    public void SwipeShoot ()
+    {
+        whenCanShoot = Time.time + .1f;
+        source.PlayOneShot(shootSound);
+        GameObject bullet = Instantiate(bulletPrefab, shootingPoint.position, shootingPoint.rotation) as GameObject;
+        bullet.GetComponent<Rigidbody>().AddForce(shootingPoint.forward * 3500);
+        whenCanShoot = Time.time + shootDelay;
+    }
+    
 }
